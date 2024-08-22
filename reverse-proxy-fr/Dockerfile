@@ -1,3 +1,5 @@
+
+
 # First Stage: Install dependencies and build the app
 FROM node:18-alpine AS builder
 
@@ -8,7 +10,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci
 
 # Copy the rest of the application code
 COPY . .
@@ -26,9 +28,7 @@ WORKDIR /app
 COPY --from=builder /app/package.json /app/package-lock.json ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-
-# Install only production dependencies
-RUN npm install --only=production
+COPY --from=builder /app/node_modules ./node_modules
 
 # Expose the port Next.js runs on
 EXPOSE 3000
