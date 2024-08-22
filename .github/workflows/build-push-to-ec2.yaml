@@ -27,7 +27,7 @@ jobs:
       run: |
         docker buildx build \
           --platform linux/amd64 \
-          --tag your-dockerhub-username/reverse-proxy-be:latest \
+          --tag ${{ secrets.DOCKER_USERNAME }}/reverse-proxy-be:latest \
           --push \
           ./reverse-proxy-be
 
@@ -35,7 +35,7 @@ jobs:
       run: |
         docker buildx build \
           --platform linux/amd64 \
-          --tag your-dockerhub-username/reverse-proxy-fr:latest \
+          --tag ${{ secrets.DOCKER_USERNAME }}/reverse-proxy-fr:latest \
           --push \
           ./reverse-proxy-fr
 
@@ -43,9 +43,17 @@ jobs:
       run: |
         docker buildx build \
           --platform linux/amd64 \
-          --tag your-dockerhub-username/nginx-with-frontend:latest \
+          --tag ${{ secrets.DOCKER_USERNAME }}/nginx-with-frontend:latest \
           --push \
           ./reverse-proxy-fr
+
+    - name: Build and push PostgreSQL image
+      run: |
+        docker buildx build \
+          --platform linux/amd64 \
+          --tag ${{ secrets.DOCKER_USERNAME }}/postgres:latest \
+          --push \
+          ./postgres  # Path to your custom PostgreSQL Dockerfile
 
   deploy:
     needs: build-and-push
@@ -68,6 +76,7 @@ jobs:
         scp -i ec2-key.pem -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USER }}/your-project
         ssh -i ec2-key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           cd /home/${{ secrets.EC2_USER }}/your-project
+          docker-compose down
           docker-compose pull
           docker-compose up -d
         EOF
