@@ -45,7 +45,8 @@ jobs:
           --platform linux/amd64 \
           --tag ${{ secrets.DOCKER_USERNAME }}/nginx-with-frontend:latest \
           --push \
-          ./reverse-proxy-fr
+          ./nginx
+
 
     - name: Build and push PostgreSQL image
       run: |
