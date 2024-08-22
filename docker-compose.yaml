@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  backend:
+    build:
+      context: ./reverse-proxy-be
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "npm run migrate && npm start"
+    container_name: node_express_app
+    environment:
+      DEVELOPMENT_USERNAME: sreuser
+      DEVELOPMENT_PASSWORD: Ab@12345
+      DEVELOPMENT_DATABASE: rambo
+      DEVELOPMENT_HOST: postgres
+      DEVELOPMENT_DIALECT: postgres
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./reverse-proxy-fr
+      dockerfile: Dockerfile
+    ports:
+      - "4000:3000"
+    container_name: frontend_app
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  nginx:
+    build: 
+      context: ./reverse-proxy-fr
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    container_name: nginx_with_frontend
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:latest
+    container_name: my_postgres_db
+    environment:
+      POSTGRES_USER: sreuser
+      POSTGRES_PASSWORD: Ab@12345
+      POSTGRES_DB: rambo
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sreuser"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+networks:
+  app-network:
