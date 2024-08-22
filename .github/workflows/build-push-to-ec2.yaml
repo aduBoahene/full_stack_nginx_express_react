@@ -73,7 +73,7 @@ jobs:
       run: |
         echo "${{ secrets.EC2_SSH_KEY }}" > ec2-key.pem  # Create the key from the secret
         chmod 600 ec2-key.pem  # Set appropriate permissions for the key
-        scp -i ec2-key.pem -o StrictHostKeyChecking=no docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu
+        scp -i ec2-key.pem -o StrictHostKeyChecking=no docker-compose.yaml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu
         ssh -i ec2-key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
           cd /home/ubuntu
           docker-compose pull
