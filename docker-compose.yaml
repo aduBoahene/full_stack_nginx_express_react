@@ -21,18 +21,6 @@ services:
     networks:
       - app-network
 
-  frontend:
-    build:
-      context: ./reverse-proxy-fr
-      dockerfile: Dockerfile
-    ports:
-      - "4000:3000"
-    container_name: frontend_app
-    depends_on:
-      - backend
-    networks:
-      - app-network
-
   nginx:
     build: 
       context: ./reverse-proxy-fr
@@ -41,7 +29,7 @@ services:
       - "80:80"
     depends_on:
       - backend
-    container_name: nginx_with_frontend
+    container_name: nginx_with_reverse-proxy
     networks:
       - app-network
 

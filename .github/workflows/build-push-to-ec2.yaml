@@ -31,19 +31,11 @@ jobs:
           --push \
           ./reverse-proxy-be
 
-    - name: Build and push frontend image
-      run: |
-        docker buildx build \
-          --platform linux/amd64 \
-          --tag ${{ secrets.DOCKER_USERNAME }}/reverse-proxy-fr:latest \
-          --push \
-          ./reverse-proxy-fr
-
     - name: Build and push nginx image
       run: |
         docker buildx build \
           --platform linux/amd64 \
-          --tag ${{ secrets.DOCKER_USERNAME }}/nginx-with-frontend:latest \
+          --tag ${{ secrets.DOCKER_USERNAME }}/nginx-with-reverse-proxy:latest \
           --push \
           ./nginx
 
